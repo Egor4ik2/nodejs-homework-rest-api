@@ -2,9 +2,9 @@ import express from "express";
 
 const contactsRouter = express.Router();
 
-import ctrl from "../../controllers/contacts.js";
+import ctrl from "../../controller/contact.js";
 
-import validateBody from "../../middlewares/validateBody.js";
+import validateBody from "../../midwares/body.js";
 
 import addSchema from "../../schema/schema.js";
 
