@@ -1,65 +1,53 @@
-import fs from "fs/promises";
-import path from "path";
-import { nanoid } from "nanoid";
+import { Schema, model } from "mongoose";
+import Joi from "joi";
 
-const contactsPath = path.resolve("models", "contacts.json");
-const updateContactsData = (contacts) =>
-  fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
+import { handleMongooseError, runValidateAtUpdate } from "./hooks.js";
 
-const listContacts = async () => {
-  const contacts = await fs.readFile(contactsPath);
-  return JSON.parse(contacts);
-};
+const contactSchema = new Schema(
+  {
+    name: {
+      type: String,
+      required: [true, "Set name for contact"],
+    },
+    email: {
+      type: String,
+    },
+    phone: {
+      type: String,
+    },
+    favorite: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  { versionKey: false, timestamps: true }
+);
 
-const getContactById = async (contactId) => {
-  const contacts = await listContacts();
-  const contactById = contacts.find((el) => el.id === contactId);
-  console.log(contactById);
-  return contactById || null;
-};
+contactSchema.post("save", handleMongooseError);
 
-const removeContact = async (contactId) => {
-  const contacts = await listContacts();
-  const index = contacts.findIndex((el) => el.id === contactId);
-  if (index === -1) {
-    return;
-  }
-  const [removedContact] = contacts.splice(index, 1);
-  updateContactsData(contacts);
-  return removedContact;
-};
+contactSchema.pre("findOneAndUpdate", runValidateAtUpdate);
 
-const addContact = async (body) => {
-  const contacts = await listContacts();
-  const newContact = {
-    id: nanoid(),
-    ...body,
-  };
-  contacts.push(newContact);
-  updateContactsData(contacts);
-  return newContact;
-};
+contactSchema.post("findOneAndUpdate", handleMongooseError);
 
-const updateContact = async (contactId, body) => {
-  const contacts = await listContacts();
-  const index = contacts.findIndex((el) => el.id === contactId);
-  if (index === -1) {
-    return;
-  }
-  contacts[index] = {
-    id: contactId,
-    ...body,
-  };
-  updateContactsData(contacts);
-  return contacts[index];
-};
+export const addSchema = Joi.object({
+  name: Joi.string().required().messages({
+    "any.required": "missing required name field",
+  }),
+  email: Joi.string().required().messages({
+    "any.required": "missing required email field",
+  }),
+  phone: Joi.string().required().messages({
+    "any.required": "missing required phone field",
+  }),
+  favorite: Joi.boolean(),
+});
 
-const contactsAPI = {
-  listContacts,
-  getContactById,
-  removeContact,
-  addContact,
-  updateContact,
-};
+export const updateFavoriteSchema = Joi.object({
+  favorite: Joi.boolean()
+    .required()
+    .messages({ "any.required": "missing field favorite" }),
+});
 
-export default contactsAPI;
+const Contact = model("contact", contactSchema);
+
+export default Contact;

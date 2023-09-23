@@ -1,4 +1,2 @@
-import HttpError from "./HttpError.js";
-import controlWrapper from "./controlWrapper.js";
-
-export { HttpError, controlWrapper };
+export { default as HttpError } from "./HttpError.js";
+export { default as controlWrapper } from "./controlWrapper.js";
