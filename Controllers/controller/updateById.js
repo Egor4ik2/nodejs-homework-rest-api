@@ -1,7 +1,7 @@
-import Contact from "../models/contacts";
-import { HttpError } from "../helper/index.js";
+import Contact from "../../models/contacts";
+import { HttpError } from "../../helper/index";
 
-const updateStatusContact = async (req, res) => {
+const updateById = async (req, res) => {
   const { contactId } = req.params;
   const contact = await Contact.findByIdAndUpdate(contactId, req.body, {
     new: true,
@@ -12,4 +12,4 @@ const updateStatusContact = async (req, res) => {
   res.json(contact);
 };
 
-export default updateStatusContact;
+export default updateById;

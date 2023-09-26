@@ -1,9 +1,12 @@
 import express from "express";
 
-import validateBody from "../../midwares/body";
-import { addSchema, updateFavoriteSchema } from '../../models/contacts.js'
-import { isValidId } from "../../midwares/index.js";
-import { controlWrapper } from "../../helper/index.js";
+import { addSchema, updateFavoriteSchema } from "../../models/contacts";
+import {
+  isValidId,
+  validateBody,
+  authenticate,
+} from "../../midwares/index";
+import { controlWrapper } from "../../helper/index";
 import {
   getAll,
   getById,
@@ -11,7 +14,7 @@ import {
   deleteById,
   updateById,
   updateStatusContact,
-} from "../../controller/index";
+} from "../../Controllers/controller/index";
 
 const contactCtrl = {
   getAll: controlWrapper(getAll),
@@ -26,6 +29,8 @@ const contactAddValidate = validateBody(addSchema);
 const contactUpdateFavoriteValidate = validateBody(updateFavoriteSchema);
 
 const contactsRouter = express.Router();
+
+contactsRouter.use(authenticate);
 
 contactsRouter.get("/", contactCtrl.getAll);
 
