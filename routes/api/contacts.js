@@ -1,12 +1,14 @@
 import express from "express";
 
 import { addSchema, updateFavoriteSchema } from "../../models/contacts";
+
 import {
   isValidId,
   validateBody,
   authenticate,
-} from "../../midwares/index";
-import { controlWrapper } from "../../helper/index";
+  upload,
+} from "../../midllewares/index.js";
+import { ctrlWrapper } from "../../helper/index.js";
 import {
   getAll,
   getById,
@@ -14,15 +16,15 @@ import {
   deleteById,
   updateById,
   updateStatusContact,
-} from "../../Controllers/controller/index";
+} from "../../Controllers/controller/index.js";
 
 const contactCtrl = {
-  getAll: controlWrapper(getAll),
-  getById: controlWrapper(getById),
-  add: controlWrapper(add),
-  deleteById: controlWrapper(deleteById),
-  updateById: controlWrapper(updateById),
-  updateStatusContact: controlWrapper(updateStatusContact),
+  getAll: ctrlWrapper(getAll),
+  getById: ctrlWrapper(getById),
+  add: ctrlWrapper(add),
+  deleteById: ctrlWrapper(deleteById),
+  updateById: ctrlWrapper(updateById),
+  updateStatusContact: ctrlWrapper(updateStatusContact),
 };
 
 const contactAddValidate = validateBody(addSchema);
@@ -36,7 +38,12 @@ contactsRouter.get("/", contactCtrl.getAll);
 
 contactsRouter.get("/:contactId", isValidId, contactCtrl.getById);
 
-contactsRouter.post("/", contactAddValidate, contactCtrl.add);
+contactsRouter.post(
+  "/",
+  upload.single("avatar"),
+  contactAddValidate,
+  contactCtrl.add
+);
 
 contactsRouter.delete("/:contactId", isValidId, contactCtrl.deleteById);
 
