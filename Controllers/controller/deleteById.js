@@ -1,6 +1,7 @@
 import Contact from "../../models/contacts";
 import { HttpError } from "../../helper/index";
 
+
 const deleteById = async (req, res) => {
   const { contactId } = req.params;
   const contact = await Contact.findByIdAndDelete(contactId);
