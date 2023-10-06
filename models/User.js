@@ -1,7 +1,7 @@
 import { Schema, model } from "mongoose";
 import Joi from "joi";
 
-import { handleMongooseError, runValidateAtUpdate } from "./hooks.js";
+import { handleMongooseError, runValidateAtUpdate } from "./hooks";
 
 const subscriptionTypes = ["starter", "pro", "business"];
 
@@ -22,6 +22,15 @@ const userSchema = new Schema(
       default: "starter",
     },
     token: String,
+    avatarURL: String,
+    verify: {
+      type: Boolean,
+      default: false,
+    },
+    verificationToken: {
+      type: String,
+      // required: [true, "Verify token is required"],
+    },
   },
   { versionKey: false, timestamps: true }
 );
@@ -41,6 +50,12 @@ export const updateSubscriptionSchema = Joi.object({
   subscription: Joi.string()
     .valid(...subscriptionTypes)
     .required(),
+});
+
+export const userEmailSchema = Joi.object({
+  email: Joi.string()
+    .required()
+    .messages({ "any.required": "missing required field email" }),
 });
 
 const User = model("user", userSchema);
